@@ -1,0 +1,73 @@
+<launch>
+   
+    <param name="use_sim_time" value="true"/>
+    <node pkg="rosbag" type="play" name="rosbag_player" output="screen" args="--clock  /home/miklos/shell_parking/test_no_tf.bag -l">
+</node>
+
+  <node args="1.8 0.605 1.13 0.0 0.0 0.0 /base_link /velodyne_left 100" name="velodyne_left_tf_publisher" pkg="tf" type="static_transform_publisher"/>
+  <node args="1.4 0.0 0.4 0.0 0.0 0.0 /base_link /stereo_camera 100" name="stereo_camera_tf_publisher" pkg="tf" type="static_transform_publisher"/>
+  <node args="0.0 0.0 0.2 0.0 0.0 0.0 /base_link /duro_imu 100" name="duro_imu_tf_publisher" pkg="tf" type="static_transform_publisher"/>
+  <node args="0.0 0.0 0.2 0.0 0.0 0.0 /base_link /duro 100" name="duro_tf_publisher" pkg="tf" type="static_transform_publisher"/>
+  <node args="3.713 -0.351 -0.111 0.0 0.0 0.0 /base_link /laser 100" name="laser_tf_publisher" pkg="tf" type="static_transform_publisher"/>
+  <node args="1.8 -0.605 1.13 0.0 0.0 0.0 /base_link /velodyne_right 100" name="velodyne_right_tf_publisher" pkg="tf" type="static_transform_publisher"/>
+  <node pkg="tf" name="static_transform_gps_base_link" type="static_transform_publisher" args="0 0 0 0 0 0 base_link gps 100" ns="ns1"/>
+  <node pkg="tf" name="static_transform_gps_base_link" type="static_transform_publisher" args="0 0 0 0 0 0 map base_link 100" ns="ns2" />
+
+    <node type="gps_tf_publisher" name="gps_tf_publisher" pkg="gps_tf_publisher">
+    <param name="parent_frame" value="map"/>   
+    </node> 
+    
+    <node pkg="points_preprocessor" type="ray_ground_filter" name="ray_ground_filter" output="log" ns="namespace1">
+    <param name="input_point_topic" value="/velodyne_left/velodyne_points" />
+    <param name="base_frame" value="base_link" />
+    <param name="clipping_height" value="2.0" />
+    <param name="min_point_distance" value="0.0" />
+    <param name="radial_divider_angle" value="0.15" />
+    <param name="concentric_divider_distance" value="0.0" />
+    <param name="local_max_slope" value="10" />
+    <param name="general_max_slope" value="10" />
+    <param name="min_height_threshold" value="0.05" />
+    <param name="reclass_distance_threshold" value="0.2" />
+    <param name="no_ground_point_topic" value="no_points_left_velodyne" />
+    <param name="ground_point_topic" value="ground_points_left_velodyne" />
+
+  
+  
+</node>
+
+<node pkg="points_preprocessor" type="ray_ground_filter" name="ray_ground_filter" output="log" ns="namespace2">
+    <param name="input_point_topic" value="/velodyne_right/velodyne_points" />
+    <param name="base_frame" value="base_link" />
+    <param name="clipping_height" value="2.0" />
+    <param name="min_point_distance" value="0.0" />
+    <param name="radial_divider_angle" value="0.15" />
+    <param name="concentric_divider_distance" value="0.0" />
+    <param name="local_max_slope" value="10" />
+    <param name="general_max_slope" value="10" />
+    <param name="min_height_threshold" value="0.05" />
+    <param name="reclass_distance_threshold" value="0.2" />
+    <param name="no_ground_point_topic" value="no_points_right_velodyne" />
+    <param name="ground_point_topic" value="ground_points_right_velodyne" />
+  
+  </node>
+
+    <node pkg="points_preprocessor" type="points_concat_filter" name="points_concat_filter" output="screen" ns="ns1">
+    <param name="output_frame_id" value="base_link" />
+    <param name="input_topics" value="[/namespace1/ray_ground_filter/no_points_left_velodyne,/namespace2/ray_ground_filter/no_points_right_velodyne]" />
+    <remap from="/points_concat" to="/vel_points_concat" />
+  </node>
+  
+  <node pkg="laser_to_pc2" type="laser_to_pc2_node" name="scan_to_pc2" output="screen"/>
+
+
+  <node pkg="points_preprocessor" type="points_concat_filter" name="points_concat_filter" output="screen" ns="ns2">
+    <param name="output_frame_id" value="base_link" />
+    <param name="input_topics" value="[/vel_points_concat,/scan_point_cloud]" />
+    <remap from="/points_concat" to="/points_concat_velodyne_sick" />
+  </node>
+
+
+
+
+  
+  </launch>
