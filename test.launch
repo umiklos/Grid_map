@@ -51,23 +51,14 @@
   
   </node>
 
-    <node pkg="points_preprocessor" type="points_concat_filter" name="points_concat_filter" output="screen" ns="ns1">
-    <param name="output_frame_id" value="base_link" />
-    <param name="input_topics" value="[/namespace1/ray_ground_filter/no_points_left_velodyne,/namespace2/ray_ground_filter/no_points_right_velodyne]" />
-    <remap from="/points_concat" to="/vel_points_concat" />
-  </node>
-  
   <node pkg="laser_to_pc2" type="laser_to_pc2_node" name="scan_to_pc2" output="screen"/>
 
-
-  <node pkg="points_preprocessor" type="points_concat_filter" name="points_concat_filter" output="screen" ns="ns2">
+    <node pkg="points_preprocessor" type="points_concat_filter" name="points_concat_filter" output="screen">
     <param name="output_frame_id" value="base_link" />
-    <param name="input_topics" value="[/vel_points_concat,/scan_point_cloud]" />
-    <remap from="/points_concat" to="/points_concat_velodyne_sick" />
+    <param name="input_topics" value="[/namespace1/ray_ground_filter/no_points_left_velodyne,/namespace2/ray_ground_filter/no_points_right_velodyne,/scan_point_cloud]" />
+    <remap from="/points_concat" to="/vel_points_concat" />
   </node>
-
-
-
+   
 
   
   </launch>
