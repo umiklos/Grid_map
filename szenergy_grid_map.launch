@@ -55,11 +55,11 @@
   
   </node>
 
-  <node pkg="laser_to_pc2" type="laser_to_pc2_node" name="scan_to_pc2" output="screen"/>
+  
 
     <node pkg="points_preprocessor" type="points_concat_filter" name="points_concat_filter" output="screen">
     <param name="output_frame_id" value="base_link" />
-    <param name="input_topics" value="[/ns1/ray_ground_filter/no_points_left_velodyne,/ns2/ray_ground_filter/no_points_right_velodyne,/scan_point_cloud]" />
+    <param name="input_topics" value="[/ns1/ray_ground_filter/no_points_left_velodyne,/ns2/ray_ground_filter/no_points_right_velodyne,/cloud]" />
     <remap from="/points_concat" to="/velodyne_sick_points_concat" />
   </node>
    
